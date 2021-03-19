@@ -14,7 +14,7 @@ It's function in life is to provide simple commands to:
 * Install CIQW
 
 #+begin_example shell
-pip install giqw
+pip install ciqw
 #+end_example
 
 
@@ -49,7 +49,8 @@ Once the simulator is started, simply build and run the app.
 ciqw-run
 #+end_example
 
-/If the app is not built already, the *ciqw-build* will be called/
+/If the app is not built already, ciqw-build will be called/
+
 /Building an app require an developer key. If not present, the key will be generated/
 
 * Dependencies
@@ -88,4 +89,5 @@ There is few more ciqw commands, just explore it, they are quite self-explanator
 * Motivation, Thanks
 
 I wanted to avoid the usage of Eclipse for my developments.
+
 Got inspiration from https://github.com/danielsiwiec/garmin-connect-seed
