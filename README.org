@@ -49,9 +49,9 @@ Once the simulator is started, simply build and run the app.
 ciqw-run
 #+end_example
 
-/If the app is not built already, ciqw-build will be called/
+ⓘ /If the app is not built already, ciqw-build will be called/
 
-/Building an app require an developer key. If not present, the key will be generated/
+ⓘ /Building an app require an developer key. If not present, the key will be generated/
 
 * Dependencies
 
@@ -82,7 +82,7 @@ A quick look at the config.ini with show that the following options are tunable:
 - Version of the SDK to use
 - Generic *monkeyc* flags to use
 
-That config file is created the first time if not present.
+ⓘ That config file is created the first time if not present.
 
 There is few more ciqw commands, just explore it, they are quite self-explanatory.
 
