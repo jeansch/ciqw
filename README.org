@@ -25,7 +25,7 @@ Here is a quick example:
 
 ** First get something to build
 
-Garmin have a github rtepository with sample apps, let juste clone it and pick an app.
+Garmin have a github reepository with sample apps, let juste clone it and pick an app.
 
 #+begin_example shell
 git clone https://github.com/garmin/connectiq-apps
@@ -35,23 +35,23 @@ cd connectiq-apps/DanceDanceGarmin
 ** Build / run an app
 
 You will need you run the *Connect IQ Device Simulator* bundeled in the SDK.
-The command to run it is
+The command to run it is:
 
 #+begin_example shell
-ciqw-sim
+ciqw-sim &
 #+end_example
 
-ⓘ /On first start, ciqw tools will download and install the last "stable" version of the Garmin sdk. (You can also get a list if installable SDKs using ciqw-list-sdks or install a specific sdk using ciqw-install-sdk _version_ /
+ⓘ On first start, ciqw tools will download and install the last "stable" version of the Garmin sdk. (You can also get a list if installable SDKs using /ciqw-list-sdks/ or install a specific sdk using /ciqw-install-sdk _version_/
 
-Once the simulator is started, simply build and run the app.
+Once the simulator is started, simply build and run the app:
 
 #+begin_example shell
 ciqw-run
 #+end_example
 
-ⓘ /If the app is not built already, ciqw-build will be called/
+ⓘ If the app is not built already, ciqw-build will be called.
 
-ⓘ /Building an app require an developer key. If not present, the key will be generated/
+ⓘ Building an app require an developer key. If not present, the key will be generated.
 
 * Dependencies
 
@@ -61,8 +61,8 @@ ciqw-run
 
 * Some informations
 
-ciqw commands allows one argument: The path of the application sources you want to build.
-So you can run it from outside of the directory.
+Ciqw commands allows the path of the application sources you want to build as only argument.
+So you can run it from outside of the directory:
 
 #+begin_example
 ciqw-build /path/of/app/sources
@@ -78,7 +78,7 @@ A quick look at the config.ini with show that the following options are tunable:
 
 - *SDKs* path
 - Key file location
-- Default device to build for
+- Default device to build for (fenix6 by default)
 - Version of the SDK to use
 - Generic *monkeyc* flags to use
 
