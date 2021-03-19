@@ -1,0 +1,91 @@
+#+TITLE: Connect IQ SDK Wrapper
+
+This is a simple wrapper to Garmin Connect IQ SDK.
+
+It's function in life is to provide simple commands to:
+
+- Install SDK
+- Setup a simple default config including generating a 'convenient' developer key
+- Build Garmin IQ app
+- Start the simulator
+- Run the app on the simulator
+- Build a package
+
+* Install CIQW
+
+#+begin_example shell
+pip install giqw
+#+end_example
+
+
+*  Using it
+
+Here is a quick example:
+
+
+** First get something to build
+
+Garmin have a github rtepository with sample apps, let juste clone it and pick an app.
+
+#+begin_example shell
+git clone https://github.com/garmin/connectiq-apps
+cd connectiq-apps/DanceDanceGarmin
+#+end_example
+
+** Build / run an app
+
+You will need you run the *Connect IQ Device Simulator* bundeled in the SDK.
+The command to run it is
+
+#+begin_example shell
+ciqw-sim
+#+end_example
+
+/On first start, ciqw tools will download and install the last "stable" version of the Garmin sdk./
+
+Once the simulator is started, simply build and run the app.
+
+#+begin_example shell
+ciqw-run
+#+end_example
+
+/If the app is not built already, the *ciqw-build* will be called/
+/Building an app require an developer key. If not present, the key will be generated/
+
+* Dependencies
+
+- Python3
+- openssl (usualy /usr/bin/openssl) to generate the developer key
+- Java runtime environment
+
+* Some informations
+
+ciqw commands allows one argument: The path of the application sources you want to build.
+So you can run it from outside of the directory.
+
+#+begin_example
+ciqw-build /path/of/app/sources
+#+end_example
+
+By default, *$HOME/.config/ciqw/config.ini* is used for the configuration.
+That can be overrid using the *CIQW_INI* environment variable.
+
+SDK is installed by default in *$HOME/.local/ciwq/sdks*.
+Also a copy a of the zip archive and all version downloaded are kept at that place.
+
+A quick look at the config.ini with show that the following options are tunable:
+
+- *sdks* path
+- Key file location
+- Default device to build for
+- Version of the SDK to use
+- Generic *monkeyc* flags to use
+
+That config file is created the first time if not present.
+
+There is few more ciqw commands, just explore it, they are quite self-explanatory.
+
+* Motivation, Thanks
+
+I wanted to avoid the usage of Eclipse for my developments.
+Got inspiration from https://github.com/danielsiwiec/garmin-connect-seed
