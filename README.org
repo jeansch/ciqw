@@ -71,7 +71,7 @@ ciqw-build /path/of/app/sources
 By default, *$HOME/.config/ciqw/config.ini* is used for the configuration.
 That can be overrid using the *CIQW_INI* environment variable.
 
-SDK is installed by default in *$HOME/.local/ciwq/SDKs*.
+SDK is installed by default in *$HOME/.local/ciwq/sdks*.
 Also a copy a of the zip archive and all version downloaded are kept at that place.
 
 A quick look at the config.ini with show that the following options are tunable:
