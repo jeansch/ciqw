@@ -41,7 +41,7 @@ The command to run it is
 ciqw-sim
 #+end_example
 
-/On first start, ciqw tools will download and install the last "stable" version of the Garmin sdk./
+ⓘ /On first start, ciqw tools will download and install the last "stable" version of the Garmin sdk. (You can also get a list if installable SDKs using ciqw-list-sdks or install a specific sdk using ciqw-install-sdk _version_ /
 
 Once the simulator is started, simply build and run the app.
 
@@ -71,12 +71,12 @@ ciqw-build /path/of/app/sources
 By default, *$HOME/.config/ciqw/config.ini* is used for the configuration.
 That can be overrid using the *CIQW_INI* environment variable.
 
-SDK is installed by default in *$HOME/.local/ciwq/sdks*.
+SDK is installed by default in *$HOME/.local/ciwq/SDKs*.
 Also a copy a of the zip archive and all version downloaded are kept at that place.
 
 A quick look at the config.ini with show that the following options are tunable:
 
-- *sdks* path
+- *SDKs* path
 - Key file location
 - Default device to build for
 - Version of the SDK to use
