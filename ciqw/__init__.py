@@ -126,7 +126,7 @@ def _run():
 def sim():
     config = read_config()
     command = _get_sdk_bin('simulator', config)
-    print("Calling '%s'." % " ".join(command))
+    print("Calling '%s'." % command)
     subprocess.Popen([command]).wait()
 
 
