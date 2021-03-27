@@ -23,6 +23,7 @@ import configparser
 import urllib.request
 import zipfile
 import subprocess
+import inotify.adapters
 import xml.etree.ElementTree as ET
 
 SDKS = 'https://developer.garmin.com/downloads/connect-iq/sdks/'
@@ -89,12 +90,10 @@ def _build(release=False):
     if jungles:
         command.append('--jungles')
         command.extend(jungles)
-
     out = "%s.%s" % (app, "prg" if not release else "iq")
     if os.path.exists(out):
         print("Removing '%s'." % out)
         os.unlink(out)
-
     if not release:
         command.extend(['--device', config['device']])
     else:
@@ -110,11 +109,11 @@ def _build(release=False):
         print("Generated '%s'." % os.path.abspath(out))
 
 
-def _run():
+def _run(force_build=False):
     config = read_config()
     app = _get_app_from_manifest()
     out = "%s.prg" % app
-    if not os.path.exists(out):
+    if force_build or not os.path.exists(out):
         _build()
     os.environ['JAVA_OPTIONS'] = "--add-modules=java.xml.bind"
     command = [_get_sdk_bin('monkeydo', config),
@@ -122,6 +121,37 @@ def _run():
     print("Calling '%s'." % " ".join(command))
     subprocess.Popen(command).wait()
 
+
+
+# TODO check for 42877 port to see if simulator is here
+
+def _may_build_and_run(path, filename):
+    print("File modified: '%s'." % os.path.join(path, filename))
+    out = "%s.prg" % _get_app_from_manifest()
+    if not os.path.exists(out):
+        _run(force_build=True)
+    if os.stat(os.path.join(path, filename)).st_mtime > os.stat(out).st_mtime:
+        _run(force_build=True)
+
+
+def _auto():
+    i = inotify.adapters.InotifyTree(".")
+    for _ev, op, path, filename in i.event_gen(yield_nones=False):
+        if 'IN_CLOSE_WRITE' in op:
+            # check if in resources, sources
+            # and for filename (.jungle. .xml)
+            # Rebuild if necessary
+            # check stat of file and prg file
+            if any((
+                    filename == 'manifest.xml',
+                    path == '.' and filename.endswith('.monkey'),
+                    path.startswith('./source') and filename.endswith('.mc'),
+                    path.startswith('./resources') and
+                    filename.endswith('.xml') and
+                    not filename.endswith('.debug.xml'),
+                    path.startswith('./resources') and
+                    filename.endswith('.png'))):
+                _may_build_and_run(path, filename)
 
 def sim():
     config = read_config()
@@ -151,6 +181,10 @@ def build():
 
 def run():
     _cd_call(_run)
+
+
+def auto():
+    _cd_call(_auto)
 
 
 def release():

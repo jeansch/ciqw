@@ -18,10 +18,9 @@ pip install ciqw
 #+end_example
 
 
-*  Using it
+* Using it
 
 Here is a quick example:
-
 
 ** First get something to build
 
@@ -52,6 +51,10 @@ ciqw-run
 ⓘ If the app is not built already, ciqw-build will be called.
 
 ⓘ Building an app require an developer key. If not present, the key will be generated.
+
+** Running automaticaly
+
+You can use *ciqw-auto* to monitor sources changes and automaticaly rebuild and restart the application on the emulator !
 
 * Dependencies
 
