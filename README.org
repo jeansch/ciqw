@@ -24,6 +24,17 @@ pip install ciqw
 
 * Using it
 
+*ⓘ Prior to you first build, please install the devices files using the sdkmanager*
+
+
+** Installing the SDK Manager
+
+#+begin_example shell
+ciqw-install-sdkmanager &
+#+end_example
+
+(And follow the instructions)
+
 Here is a quick example:
 
 ** First get something to build
