@@ -35,9 +35,7 @@ ciqw-install-sdkmanager &
 
 (And follow the instructions)
 
-Here is a quick example:
-
-** First get something to build
+** Get something to build
 
 Garmin have a github reepository with sample apps, let juste clone it and pick an app.
 
