@@ -11,6 +11,10 @@ It's function in life is to provide simple commands to:
 - Run the app on the simulator
 - Build a package
 
+* Warning
+
+It looks like when I started the project, I already used the official sdkmanager and it did install the /Devices and fonts/ which are part on another package. I will try to find how to install it without the manager. Meanwhile, I'll add some tools to get it.
+
 * Install CIQW
 
 #+begin_example shell
@@ -55,6 +59,7 @@ ciqw-run
 ** Running automaticaly
 
 You can use *ciqw-auto* to monitor sources changes and automaticaly rebuild and restart the application on the emulator !
+
 
 * Dependencies
 

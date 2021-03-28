@@ -24,6 +24,8 @@ ciqw-run = ciqw:run
 ciqw-release = ciqw:release
 ciqw-list-sdks = ciqw:list_sdks
 ciqw-install-sdk = ciqw:install_sdk
+ciqw-install-sdkmanager = ciqw:install_sdkmanager
+ciqw-run-sdkmanager = ciqw:run_sdkmanager
 ciqw-init = ciqw:init
 ciqw-genkey = ciqw:genkey
 ciqw-sim = ciqw:sim
@@ -31,7 +33,7 @@ ciqw-sim = ciqw:sim
 """
 
 setup(name='ciqw',
-      version='0.2.0',
+      version='0.3.0',
       description="Connect IQ Wrapper",
       author="Jean Schurger",
       author_email='jean@schurger.org',

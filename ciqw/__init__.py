@@ -15,6 +15,7 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 
+
 import os
 import sys
 import json
@@ -26,7 +27,7 @@ import subprocess
 import inotify.adapters
 import xml.etree.ElementTree as ET
 
-SDKS = 'https://developer.garmin.com/downloads/connect-iq/sdks/'
+DEVCIQ = 'https://developer.garmin.com/downloads/connect-iq/'
 
 CONFIG_FILENAME = os.environ.get('CIQW_INI') or os.path.join(
     os.environ['HOME'], ".config", "ciqw", "config.ini")
@@ -34,7 +35,9 @@ CONFIG_FILENAME = os.environ.get('CIQW_INI') or os.path.join(
 
 DEFAULT_CONFIG = {
     'sdks': os.path.join(os.environ['HOME'],
-                         ".local", "ciqw", "sdks"),
+                         ".Garmin", "ConnectIQ", "Sdks"),
+    'sdkmanager': os.path.join(os.environ['HOME'],
+                         ".Garmin", "ConnectIQ", "SdkManager"),
     'key': os.path.join(os.environ['HOME'], ".config", "ciqw", "key.der"),
     'device': 'fenix6',
     'flags': '--warn'}
@@ -198,12 +201,13 @@ def _install_sdk(version=None):
     if version not in sdks:
         raise Exception("Version '%s' is not available." % version)
     config = read_config()
-    target = os.path.join(config['sdks'], version)
+    target = os.path.join(config['sdks'],
+                          ".".join(sdks[version]['package'].split(".")[:-1]))
     os.makedirs(target, exist_ok=True)
     package_name = sdks[version]['package']
     package = os.path.join(config.get('sdks'), package_name)
     if not os.path.exists(package):
-        url = SDKS + sdks[version]['package']
+        url = DEVCIQ + 'sdks/' + sdks[version]['package']
         print("Downloading '%s'" % url)
         open(package, "wb").write(
             urllib.request.urlopen(url).read())
@@ -221,6 +225,48 @@ def _install_sdk(version=None):
     for f in os.listdir(os.path.join(target, 'bin')):
         bin = os.path.join(target, 'bin', f)
         os.chmod(bin, os.stat(bin).st_mode | stat.S_IEXEC)
+
+
+def install_sdkmanager():
+    packages = {'linux': 'linux',
+                'windows': 'windows',
+                'darwin': 'mac'}
+    package = None
+    for _os, _package in packages.items():
+        if sys.platform.lower().startswith(_os):
+            package = _package
+    if not package:
+        raise Exception("Unable to find package of your OS: '%s'" %
+                        sys.platform)
+    sdkmanager = json.loads(urllib.request.urlopen(
+        DEVCIQ + 'sdk-manager/' + 'sdk-manager.json').read())
+    archive = sdkmanager[package]
+    config = read_config()
+    if not os.path.exists(config['sdkmanager']):
+        os.makedirs(config['sdkmanager'], exist_ok=True)
+    archive_file = os.path.join(config['sdkmanager'],
+                                '%s-%s.zip' % (archive.replace(".zip", ""),
+                                               sdkmanager['version']))
+
+    if not os.path.exists(archive_file):
+        url = DEVCIQ + 'sdk-manager/' + archive
+        print("Downloading '%s'" % url)
+        open(archive_file, "wb").write(
+            urllib.request.urlopen(url).read())
+    bin = os.path.join(config['sdkmanager'], 'bin', 'sdkmanager')
+    if not os.path.exists(bin):
+        print("Extracting '%s' to '%s'." % (archive_file, config['sdkmanager']))
+        zf = zipfile.ZipFile(archive_file)
+        zf.extractall(config['sdkmanager'])
+        os.chmod(bin, os.stat(bin).st_mode | stat.S_IEXEC)
+
+
+def run_sdkmanager():
+    config = read_config()
+    if not os.path.exists(os.path.join(config['sdkmanager'], 'bin', 'sdkmanager')):
+        install_sdkmanager()
+    subprocess.Popen([os.path.join(
+        config['sdkmanager'], 'bin', 'sdkmanager')]).wait()
 
 
 def install_sdk():
@@ -243,7 +289,8 @@ def get_available_sdks():
     if not package:
         raise Exception("Unable to find package of your OS: '%s'" %
                         sys.platform)
-    for sdk in json.loads(urllib.request.urlopen(SDKS + 'sdks.json').read()):
+    for sdk in json.loads(urllib.request.urlopen(
+            DEVCIQ + 'sdks/' + 'sdks.json').read()):
         package_name = sdk.get(package)
         if package_name:
             sdks[sdk['version']] = {'title': sdk['title'],
@@ -261,6 +308,7 @@ def list_sdks():
     for version, sdk in sdks.items():
         print("- %s: '%s' (release: %s)" % (
             version, sdk['title'], sdk['release']))
+
 
 
 def _genkey(der):
