@@ -75,11 +75,16 @@ def _get_sdk_bin(name, config):
     if not config.get('version'):
         _install_sdk()
     config.update(read_config())
-    bin = os.path.join(config['sdks'], config['version'],
-                       'bin', name)
-    if not os.path.exists(bin):
-        _install_sdk(config.get('version'))
-    return bin
+    sdk = None
+    for f in os.listdir(os.path.join(config['sdks'])):
+        if (os.path.isdir(os.path.join(config['sdks'], f)) and
+            f.startswith("connectiq-sdk-") and config['version'] in f):
+            sdk = f
+            break
+    if sdk:
+        return os.path.join(config['sdks'], sdk, 'bin', name)
+    _install_sdk(config.get('version'))
+
 
 
 def _build(release=False):

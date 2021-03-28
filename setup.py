@@ -33,7 +33,7 @@ ciqw-sim = ciqw:sim
 """
 
 setup(name='ciqw',
-      version='0.3.0',
+      version='0.3.1',
       description="Connect IQ Wrapper",
       author="Jean Schurger",
       author_email='jean@schurger.org',
