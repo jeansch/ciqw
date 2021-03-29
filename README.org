@@ -9,11 +9,9 @@ It's function in life is to provide simple commands to:
 - Build Garmin IQ app
 - Start the simulator
 - Run the app on the simulator
-- Build a package
-
-* Warning
-
-It looks like when I started the project, I already used the official sdkmanager and it did install the /Devices and fonts/ which are part on another package. I will try to find how to install it without the manager. Meanwhile, I'll add some tools to get it.
+- Release a package
+- Install the SDK manager
+- Install the fonts and devices files
 
 * Install CIQW
 
@@ -40,8 +38,10 @@ ciqw-install-sdkmanager
 or use the following commands
 
 #+begin_example shell
-ciqw-login
+ciqw-login [username] [password]
 #+end_example
+
+
 
 #+begin_example shell
 ciqw-install-fonts-and-devices
