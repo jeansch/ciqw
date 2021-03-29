@@ -24,16 +24,28 @@ pip install ciqw
 
 * Using it
 
-*ⓘ Prior to you first build, please install the devices files using the sdkmanager*
+ⓘ Prior to you first build, /Fonts/ and /Devices/ must be installed along to the SDK.
+The download of those files needs to be authentified.
 
+** Installing fonts and devices files
 
-** Installing the SDK Manager
+To do that, you can either use the /sdkmanager/:
 
 #+begin_example shell
-ciqw-install-sdkmanager &
+ciqw-install-sdkmanager
 #+end_example
 
 (And follow the instructions)
+
+or use the following commands
+
+#+begin_example shell
+ciqw-login
+#+end_example
+
+#+begin_example shell
+ciqw-install-fonts-and-devices
+#+end_example
 
 ** Get something to build
 
