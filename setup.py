@@ -29,11 +29,12 @@ ciqw-run-sdkmanager = ciqw:run_sdkmanager
 ciqw-init = ciqw:init
 ciqw-genkey = ciqw:genkey
 ciqw-sim = ciqw:sim
-
+ciqw-login = ciqw:login
+ciqw-install-fonts-and-devices = ciqw:install_fonts_and_devices
 """
 
 setup(name='ciqw',
-      version='0.3.1',
+      version='0.4.0',
       description="Connect IQ Wrapper",
       author="Jean Schurger",
       author_email='jean@schurger.org',
@@ -41,5 +42,5 @@ setup(name='ciqw',
       entry_points={
           'console_scripts': console_scripts,
       },
-      install_requires=['inotify'],
+      install_requires=['inotify', 'requests', 'pyquery'],
       license='GPLv3')
