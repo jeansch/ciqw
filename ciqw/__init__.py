@@ -18,6 +18,6 @@
 
 from ciqw.sdks import  install_sdk, install_sdkmanager, list_sdks
 from ciqw.config import init
-from ciqw.run import build, run, auto, sim
+from ciqw.run import build, run, auto, sim, release
 from ciqw.auth import login
 from ciqw.fonts_and_devices import install_fonts_and_devices
