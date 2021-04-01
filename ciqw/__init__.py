@@ -15,9 +15,14 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 
+import logging
+logging.basicConfig()
+logging.getLogger().setLevel(logging.INFO)
 
 from ciqw.sdks import  install_sdk, install_sdkmanager, list_sdks, run_sdkmanager
-from ciqw.config import init
+from ciqw.config import init, setup_logger
 from ciqw.run import build, run, auto, sim, release
 from ciqw.auth import login
 from ciqw.fonts_and_devices import install_fonts_and_devices
+
+setup_logger()

@@ -15,6 +15,7 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 
+import logging
 import os
 import sys
 import subprocess
@@ -24,10 +25,12 @@ try:
     import inotify.adapters
     have_inotify = True
 except Exception:
-    pass 
+    pass
 
-from ciqw.sdks import _install_sdk
-from ciqw.config import read_config, genkey
+from ciqw.sdks import _install_sdk  # pylint: disable=C0413
+from ciqw.config import read_config, genkey  # pylint: disable=C0413
+
+logger = logging.getLogger(__name__)
 
 
 def _get_app_from_manifest():
@@ -46,13 +49,12 @@ def _get_sdk_bin(name, config):
                                 'Application Support',
                                 'Garmin', 'ConnectIQ', 'Sdks',
                                 'connectiq-sdk', 'bin', 'ConnectIQ.app',
-                                'Contents', 'MacOS', 'simulator')            
+                                'Contents', 'MacOS', 'simulator')
         return os.path.join(os.getenv('HOME'), 'Library',
                             'Application Support',
                             'Garmin', 'ConnectIQ', 'Sdks',
                             'connectiq-sdk', 'bin', name)
-        
-        sdk = None
+    sdk = None
     for f in os.listdir(os.path.join(config['sdks'])):
         if (os.path.isdir(os.path.join(config['sdks'], f)) and
                 f.startswith("connectiq-sdk-") and config['version'] in f):
@@ -66,11 +68,11 @@ def _get_sdk_bin(name, config):
 def sim():
     config = read_config()
     command = _get_sdk_bin('simulator', config)
-    print("Calling '%s'." % command)
+    logger.info("Calling '%s'." % command)
     subprocess.Popen([command]).wait()
 
 
-def _build(release=False):
+def _build(do_release=False):
     config = read_config()
     jungles = set()
     for f in os.listdir():
@@ -81,11 +83,11 @@ def _build(release=False):
     if jungles:
         command.append('--jungles')
         command.extend(jungles)
-    out = "%s.%s" % (app, "prg" if not release else "iq")
+    out = "%s.%s" % (app, "prg" if not do_release else "iq")
     if os.path.exists(out):
-        print("Removing '%s'." % out)
+        logger.info("Removing '%s'." % out)
         os.unlink(out)
-    if not release:
+    if not do_release:
         command.extend(['--device', config['device']])
     else:
         command.extend(['--release', '--package-app'])
@@ -94,10 +96,10 @@ def _build(release=False):
     if not os.path.exists(config['key']):
         genkey()
     command.extend(config.get('flags', '').split())
-    print("Calling '%s'." % " ".join(command))
+    logger.info("Calling '%s'." % " ".join(command))
     subprocess.Popen(command).wait()
     if os.path.exists(out):
-        print("Generated '%s'." % os.path.abspath(out))
+        logger.info("Generated '%s'." % os.path.abspath(out))
 
 
 def _run(force_build=False):
@@ -109,14 +111,14 @@ def _run(force_build=False):
     os.environ['JAVA_OPTIONS'] = "--add-modules=java.xml.bind"
     command = [_get_sdk_bin('monkeydo', config),
                out, config['device']]
-    print("Calling '%s'." % " ".join(command))
+    logger.info("Calling '%s'." % " ".join(command))
     subprocess.Popen(command).wait()
 
 
 # TODO check for 42877 port to see if simulator is here
 
 def _may_build_and_run(path, filename):
-    print("File modified: '%s'." % os.path.join(path, filename))
+    logger.info("File modified: '%s'." % os.path.join(path, filename))
     out = "%s.prg" % _get_app_from_manifest()
     if not os.path.exists(out):
         _run(force_build=True)
@@ -126,8 +128,8 @@ def _may_build_and_run(path, filename):
 
 def _auto():
     if not have_inotify:
-        print("Inotify not supported on your system yet.")
-        sys.exit(1)
+        logger.info("Inotify not supported on your system yet.")
+        sys.error(1)
     i = inotify.adapters.InotifyTree(".")
     for _ev, op, path, filename in i.event_gen(yield_nones=False):
         if 'IN_CLOSE_WRITE' in op:
@@ -158,7 +160,7 @@ def _cd_call(fct):
         if path:
             os.chdir(cwd)
     except Exception as e:
-        print(str(e))
+        logger.error(str(e))
         sys.exit(1)
 
 
@@ -175,4 +177,4 @@ def auto():
 
 
 def release():
-    _build(release=True)
+    _build(do_release=True)

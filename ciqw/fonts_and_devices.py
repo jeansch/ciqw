@@ -15,12 +15,14 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 
+import logging
 import os
 import sys
 import zipfile
 import requests
-
 from ciqw.auth import _get_access_token
+
+logger = logging.getLogger(__name__)
 
 SGC = "https://services.garmin.com"
 APIGCS = "https://api.gcs.garmin.com"
@@ -70,8 +72,8 @@ def get_font_list(token):
 def install_fonts_and_devices():
     token = _get_access_token()
     if not token:
-        print("You need to login to install fonts and devices")
-        sys.exit(1)
+        logger.info("You need to login to install fonts and devices")
+        sys.error(1)
     _install_fonts_and_devices(token)
 
 
@@ -102,7 +104,7 @@ def _install_fonts(token):
             APIGCS +
             "/ciq-product-onboarding/fonts?fontName=%s" % font['name'],
             headers=headers, verify=SSL_VERIFY)
-        print("Downloading font '%s'." % font['name'])
+        logger.info("Downloading font '%s'." % font['name'])
         open(font_filename, "wb").write(req.content)
 
 
@@ -135,7 +137,7 @@ def _install_devices(token):
                 "/ciq-product-onboarding/devices/%s/ciqInfo" %
                 device['partNumber'],
                 headers=headers, verify=SSL_VERIFY)
-            print("Downloading device '%s'." % device['name'])
+            logger.info("Downloading device '%s'." % device['name'])
             open(device_path + ".zip", "wb").write(req.content)
             zf = zipfile.ZipFile(device_path + ".zip")
             zf.extractall(device_path)
