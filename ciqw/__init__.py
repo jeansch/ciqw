@@ -18,6 +18,8 @@
 import logging
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
+logging.getLogger().handlers[0].setFormatter(
+    logging.Formatter('%(message)s'))
 
 from ciqw.sdks import  install_sdk, install_sdkmanager, list_sdks, run_sdkmanager
 from ciqw.config import init, setup_logger
