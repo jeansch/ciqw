@@ -24,14 +24,31 @@ CONFIG_FILENAME = os.environ.get('CIQW_INI') or os.path.join(
     os.environ['HOME'], ".config", "ciqw", "config.ini")
 
 
-DEFAULT_CONFIG = {
-    'sdks': os.path.join(os.environ['HOME'],
-                         ".Garmin", "ConnectIQ", "Sdks"),
-    'sdkmanager': os.path.join(os.environ['HOME'],
-                         ".Garmin", "ConnectIQ", "SdkManager"),
+DEFAULT_CONFIG = {    
     'key': os.path.join(os.environ['HOME'], ".config", "ciqw", "key.der"),
     'device': 'fenix6',
     'flags': '--warn'}
+
+if sys.platform.lower().startswith('darwin'):
+    DEFAULT_CONFIG.update({
+        'sdks': os.path.join(os.environ['HOME'],
+                             'Library',
+                             'Application Support',
+                             'Garmin', 
+                             "ConnectIQ", "Sdks"),
+        'sdkmanager': os.path.join(os.environ['HOME'],
+                                   'Library',
+                                   'Application Support',
+                                   'Garmin',                                    
+                                   "ConnectIQ", "SdkManager"),
+    })    
+else:
+    DEFAULT_CONFIG.update({
+        'sdks': os.path.join(os.environ['HOME'],
+                             ".Garmin", "ConnectIQ", "Sdks"),
+        'sdkmanager': os.path.join(os.environ['HOME'],
+                                   ".Garmin", "ConnectIQ", "SdkManager"),
+    })    
 
 
 def read_config():

@@ -19,7 +19,12 @@ import os
 import sys
 import subprocess
 import xml.etree.ElementTree as ET
-import inotify.adapters
+have_inotify = False
+try:
+    import inotify.adapters
+    have_inotify = True
+except Exception:
+    pass 
 
 from ciqw.sdks import _install_sdk
 from ciqw.config import read_config, genkey
@@ -35,7 +40,19 @@ def _get_sdk_bin(name, config):
     if not config.get('version'):
         _install_sdk()
     config.update(read_config())
-    sdk = None
+    if sys.platform.lower().startswith('darwin'):
+        if name == 'simulator':
+            return os.path.join(os.getenv('HOME'), 'Library',
+                                'Application Support',
+                                'Garmin', 'ConnectIQ', 'Sdks',
+                                'connectiq-sdk', 'bin', 'ConnectIQ.app',
+                                'Contents', 'MacOS', 'simulator')            
+        return os.path.join(os.getenv('HOME'), 'Library',
+                            'Application Support',
+                            'Garmin', 'ConnectIQ', 'Sdks',
+                            'connectiq-sdk', 'bin', name)
+        
+        sdk = None
     for f in os.listdir(os.path.join(config['sdks'])):
         if (os.path.isdir(os.path.join(config['sdks'], f)) and
                 f.startswith("connectiq-sdk-") and config['version'] in f):
@@ -108,6 +125,9 @@ def _may_build_and_run(path, filename):
 
 
 def _auto():
+    if not have_inotify:
+        print("Inotify not supported on your system yet.")
+        sys.exit(1)
     i = inotify.adapters.InotifyTree(".")
     for _ev, op, path, filename in i.event_gen(yield_nones=False):
         if 'IN_CLOSE_WRITE' in op:

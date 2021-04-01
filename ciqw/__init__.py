@@ -16,7 +16,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 
 
-from ciqw.sdks import  install_sdk, install_sdkmanager, list_sdks
+from ciqw.sdks import  install_sdk, install_sdkmanager, list_sdks, run_sdkmanager
 from ciqw.config import init
 from ciqw.run import build, run, auto, sim, release
 from ciqw.auth import login

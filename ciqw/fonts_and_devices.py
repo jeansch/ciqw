@@ -77,6 +77,11 @@ def _install_fonts_and_devices(token):
 def _install_fonts(token):
     fonts_root = os.path.join(os.getenv('HOME'), '.Garmin',
                               'ConnectIQ', 'Fonts')
+    if sys.platform.lower().startswith('darwin'):    
+        fonts_root = os.path.join(os.getenv('HOME'), 'Library',
+                                  'Application Support',
+                                  'Garmin', 'ConnectIQ', 'Fonts')
+    os.makedirs(fonts_root, exist_ok=True)        
     for font in get_font_list(token):
         font_filename = os.path.join(fonts_root, "%s.cft" % font['name'])
         md5_filename = os.path.join(fonts_root, "%s.md5" % font['name'])
@@ -99,6 +104,11 @@ def _install_fonts(token):
 def _install_devices(token):
     devices_root = os.path.join(os.getenv('HOME'), '.Garmin',
                                 'ConnectIQ', 'Devices')
+    if sys.platform.lower().startswith('darwin'):
+        devices_root = os.path.join(os.getenv('HOME'), 'Library',
+                                    'Application Support',
+                                    'Garmin', 'ConnectIQ', 'Devices')
+    os.makedirs(devices_root, exist_ok=True)
     for device in get_device_list(token):
         # {'deviceUuid': 'b957e0db-67bb-4b6f-9aa2-426efcbe46fe',
         # 'partNumber': '006-B2859-00',

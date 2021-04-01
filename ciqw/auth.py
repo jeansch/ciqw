@@ -55,7 +55,7 @@ def get_token(ticket):
 
 def read_sdkmanager_config():
     sdkmini = os.path.join(os.getenv('HOME'), '.Garmin', 'ConnectIQ',
-                        'sdkmanager-config.ini')
+                        'sdkmanager-config.ini')    
     if os.path.exists(sdkmini):
         return dict(l.split('=') for l in open(sdkmini).readlines()
                     if '=' in l)
@@ -65,6 +65,13 @@ def read_sdkmanager_config():
 def write_sdkmanager_config(config):
     sdkmini = os.path.join(os.getenv('HOME'), '.Garmin', 'ConnectIQ',
                         'sdkmanager-config.ini')
+    if sys.platform.lower().startswith('darwin'):
+        devices_root = os.path.join(os.getenv('HOME'), 'Library',
+                                    'Application Support',
+                                    'Garmin', 'ConnectIQ',
+                                    'sdkmanager-config.ini')    
+    os.makedirs(os.path.join(os.getenv('HOME'), '.Garmin', 'ConnectIQ'), 
+        exist_ok=True)
     open(sdkmini, "w").write("\n".join(
         "%s=%s" % (k, v) for k, v in config.items()) + "\n")
 
