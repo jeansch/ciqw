@@ -98,14 +98,17 @@ def _install_fonts(token):
             if os.path.exists(font_filename) and md5 == font['fontHash']:
                 continue
         open(md5_filename, "w").write(font['fontHash'])
-        headers = {'accept': 'application/json',
-                   'authorization': 'Bearer %s' % token}
+        headers = {'authorization': 'Bearer %s' % token,
+                   'accept': '*/*'}
         req = requests.get(
             APIGCS +
-            "/ciq-product-onboarding/fonts?fontName=%s" % font['name'],
+            "/ciq-product-onboarding/fonts/font?fontName=%s" % font['name'],
             headers=headers, verify=SSL_VERIFY)
         logger.info("Downloading font '%s'." % font['name'])
-        open(font_filename, "wb").write(req.content)
+        open('%s.zip' % font_filename, "wb").write(req.content)
+        zf = zipfile.ZipFile('%s.zip' % font_filename)
+        zf.extractall(fonts_root)
+        os.unlink('%s.zip' % font_filename)
 
 
 def _install_devices(token):
@@ -130,7 +133,7 @@ def _install_devices(token):
         # 'lastUpdateTime': '2020-08-19 17:16:16'}
         device_path = os.path.join(devices_root, device['name'])
         if not os.path.exists(device_path):
-            headers = {'accept': 'application/json',
+            headers = {'accept': '*/*',
                        'authorization': 'Bearer %s' % token}
             req = requests.get(
                 APIGCS +
