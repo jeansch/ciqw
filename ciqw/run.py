@@ -93,9 +93,6 @@ def _build(do_release=False):
         command.append('--jungles')
         command.extend(jungles)
     out = "%s.%s" % (app, "prg" if not do_release else "iq")
-    if os.path.exists(out):
-        logger.info("Removing '%s'." % out)
-        os.unlink(out)
     if not do_release:
         command.extend(['--device', config['device']])
     else:
@@ -118,6 +115,7 @@ def _run(force_build=False):
     out = "%s.prg" % app
     if force_build or not os.path.exists(out):
         _build()
+
     os.environ['JAVA_OPTIONS'] = "--add-modules=java.xml.bind"
     command = [_get_sdk_bin('monkeydo', config),
                out, config['device']]
