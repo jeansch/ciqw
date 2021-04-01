@@ -17,13 +17,15 @@
 
 import os
 import sys
-import requests
 import zipfile
+import requests
+
 from ciqw.auth import _get_access_token
 
 SGC = "https://services.garmin.com"
 APIGCS = "https://api.gcs.garmin.com"
 
+SSL_VERIFY = not sys.platform.lower().startswith('darwin')
 
 # Function hidden here, not used
 # def get_customer_account(token):
@@ -41,7 +43,8 @@ def get_device_list(token):
     headers = {'accept': 'application/json',
                'authorization': 'Bearer %s' % token}
     req = requests.get(
-        APIGCS + "/ciq-product-onboarding/devices", headers=headers)
+        APIGCS + "/ciq-product-onboarding/devices",
+        headers=headers, verify=SSL_VERIFY)
     return req.json()
 
 
@@ -49,7 +52,9 @@ def get_device_zip(token, device):
     headers = {'accept': 'application/json',
                'authorization': 'Bearer %s' % token}
     req = requests.get(
-        APIGCS + "/ciq-product-onboarding/devices/%s/ciqInfo" % device, headers=headers)
+        APIGCS +
+        "/ciq-product-onboarding/devices/%s/ciqInfo" % device,
+        headers=headers, verify=SSL_VERIFY)
     return req.content
 
 
@@ -57,7 +62,8 @@ def get_font_list(token):
     headers = {'accept': 'application/json',
                'authorization': 'Bearer %s' % token}
     req = requests.get(
-        APIGCS + "/ciq-product-onboarding/fonts", headers=headers)
+        APIGCS + "/ciq-product-onboarding/fonts",
+        headers=headers, verify=SSL_VERIFY)
     return req.json()
 
 
@@ -77,11 +83,11 @@ def _install_fonts_and_devices(token):
 def _install_fonts(token):
     fonts_root = os.path.join(os.getenv('HOME'), '.Garmin',
                               'ConnectIQ', 'Fonts')
-    if sys.platform.lower().startswith('darwin'):    
+    if sys.platform.lower().startswith('darwin'):
         fonts_root = os.path.join(os.getenv('HOME'), 'Library',
                                   'Application Support',
                                   'Garmin', 'ConnectIQ', 'Fonts')
-    os.makedirs(fonts_root, exist_ok=True)        
+    os.makedirs(fonts_root, exist_ok=True)
     for font in get_font_list(token):
         font_filename = os.path.join(fonts_root, "%s.cft" % font['name'])
         md5_filename = os.path.join(fonts_root, "%s.md5" % font['name'])
@@ -95,10 +101,9 @@ def _install_fonts(token):
         req = requests.get(
             APIGCS +
             "/ciq-product-onboarding/fonts?fontName=%s" % font['name'],
-            headers=headers)
+            headers=headers, verify=SSL_VERIFY)
         print("Downloading font '%s'." % font['name'])
         open(font_filename, "wb").write(req.content)
-
 
 
 def _install_devices(token):
@@ -126,7 +131,10 @@ def _install_devices(token):
             headers = {'accept': 'application/json',
                        'authorization': 'Bearer %s' % token}
             req = requests.get(
-                APIGCS + "/ciq-product-onboarding/devices/%s/ciqInfo" % device['partNumber'], headers=headers)
+                APIGCS +
+                "/ciq-product-onboarding/devices/%s/ciqInfo" %
+                device['partNumber'],
+                headers=headers, verify=SSL_VERIFY)
             print("Downloading device '%s'." % device['name'])
             open(device_path + ".zip", "wb").write(req.content)
             zf = zipfile.ZipFile(device_path + ".zip")

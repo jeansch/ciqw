@@ -18,15 +18,16 @@
 import os
 import sys
 import stat
-import json
-import urllib
 import zipfile
 import subprocess
 import configparser
 import shutil
+import requests
 from ciqw.config import read_config, CONFIG_FILENAME
 
 DEVCIQ = 'https://developer.garmin.com/downloads/connect-iq/'
+
+SSL_VERIFY = not sys.platform.lower().startswith('darwin')
 
 
 def _install_sdk(version=None):
@@ -40,19 +41,19 @@ def _install_sdk(version=None):
                           ".".join(sdks[version]['package'].split(".")[:-1]))
     package_basename = os.path.basename(target)
     if sys.platform.lower().startswith('darwin'):
-        target = os.path.join(config['sdks'], "connectiq-sdk")        
+        target = os.path.join(config['sdks'], "connectiq-sdk")
     package_name = sdks[version]['package']
-    package = os.path.join(config.get('sdks'), package_name)    
+    package = os.path.join(config.get('sdks'), package_name)
     if not os.path.exists(package):
         url = DEVCIQ + 'sdks/' + sdks[version]['package']
         print("Downloading '%s'" % url)
         os.makedirs(os.path.dirname(target), exist_ok=True)
         open(package, "wb").write(
-            urllib.request.urlopen(url).read())
+            requests.get(url, verify=SSL_VERIFY).content)
     if package.endswith(".zip"):
         if not os.path.exists(os.path.join(target, 'bin', 'monkeyc')):
             print("Extracting '%s' to '%s'." % (package, target))
-            os.makedirs(target, exist_ok=True)                    
+            os.makedirs(target, exist_ok=True)
             zf = zipfile.ZipFile(package)
             zf.extractall(target)
     if package.endswith(".dmg"):
@@ -61,7 +62,7 @@ def _install_sdk(version=None):
             VOL = "/Volumes/Connect IQ SDK/"
             subprocess.Popen(["hdiutil", "mount", package]).wait()
             shutil.copytree(os.path.join(VOL, package_basename), target)
-            subprocess.Popen(["hdiutil", "unmount", VOL]).wait()            
+            subprocess.Popen(["hdiutil", "unmount", VOL]).wait()
     if config.get('version') != version:
         print("Updating version configuration with '%s'." % version)
         config['version'] = version
@@ -86,8 +87,9 @@ def install_sdkmanager():
     if not package:
         raise Exception("Unable to find package of your OS: '%s'" %
                         sys.platform)
-    sdkmanager = json.loads(urllib.request.urlopen(
-        DEVCIQ + 'sdk-manager/' + 'sdk-manager.json').read())
+    sdkmanager = requests.get(
+        DEVCIQ + 'sdk-manager/' + 'sdk-manager.json',
+        verify=SSL_VERIFY).json()
     archive = sdkmanager[package]
     config = read_config()
     if not os.path.exists(config['sdkmanager']):
@@ -96,36 +98,40 @@ def install_sdkmanager():
     archive_file = os.path.join(
         config['sdkmanager'],
         '%s-%s.%s' % (archive.replace(".%s" % ext, ""),
-                       sdkmanager['version'], ext))
+                      sdkmanager['version'], ext))
     if not os.path.exists(archive_file):
         url = DEVCIQ + 'sdk-manager/' + archive
         print("Downloading '%s'" % url)
-        open(archive_file, "wb").write(
-            urllib.request.urlopen(url).read())
+        open(archive_file, "wb").write(requests.get(
+            url, verify=SSL_VERIFY).content)
     bin = os.path.join(config['sdkmanager'], 'bin', 'sdkmanager')
     if sys.platform.lower().startswith('darwin'):
-            bin = os.path.join(config['sdkmanager'], 'SdkManager.app', 'Contents', 'MacOS', 'sdkmanager')    
+        bin = os.path.join(config['sdkmanager'], 'SdkManager.app',
+                           'Contents', 'MacOS', 'sdkmanager')
     if not os.path.exists(bin):
         if ext == 'zip':
             print("Extracting '%s' to '%s'." % (archive_file,
-                                                config['sdkmanager']))            
+                                                config['sdkmanager']))
             zf = zipfile.ZipFile(archive_file)
             zf.extractall(config['sdkmanager'])
             os.chmod(bin, os.stat(bin).st_mode | stat.S_IEXEC)
         if ext == 'dmg':
-            print("Extracting '%s' to '%s'." % (archive_file, config['sdkmanager']))
+            print("Extracting '%s' to '%s'." % (
+                archive_file, config['sdkmanager']))
             VOL = "/Volumes/Connect IQ SDK Manager/"
             subprocess.Popen(["hdiutil", "mount", archive_file]).wait()
             shutil.copytree(os.path.join(os.path.join(VOL, 'SdkManager.app')),
-                            os.path.join(config['sdkmanager'], 'SdkManager.app'))
-            subprocess.Popen(["hdiutil", "unmount", VOL]).wait()                          
+                            os.path.join(config['sdkmanager'],
+                                         'SdkManager.app'))
+            subprocess.Popen(["hdiutil", "unmount", VOL]).wait()
 
-            
+
 def run_sdkmanager():
     config = read_config()
     bin = os.path.join('bin', 'sdkmanager')
     if sys.platform.lower().startswith('darwin'):
-            bin = os.path.join('SdkManager.app', 'Contents', 'MacOS', 'sdkmanager')
+        bin = os.path.join('SdkManager.app', 'Contents',
+                           'MacOS', 'sdkmanager')
     fqbin = os.path.join(config['sdkmanager'], bin)
     if not os.path.exists(fqbin):
         install_sdkmanager()
@@ -152,8 +158,8 @@ def get_available_sdks():
     if not package:
         raise Exception("Unable to find package of your OS: '%s'" %
                         sys.platform)
-    for sdk in json.loads(urllib.request.urlopen(
-            DEVCIQ + 'sdks/' + 'sdks.json').read()):
+    for sdk in requests.get(DEVCIQ + 'sdks/' + 'sdks.json',
+                            verify=SSL_VERIFY).json():
         package_name = sdk.get(package)
         if package_name:
             sdks[sdk['version']] = {'title': sdk['title'],
