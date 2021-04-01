@@ -72,8 +72,8 @@ def get_font_list(token):
 def install_fonts_and_devices():
     token = _get_access_token()
     if not token:
-        logger.info("You need to login to install fonts and devices")
-        sys.error(1)
+        logger.error("You need to login to install fonts and devices")
+        sys.exit(1)
     _install_fonts_and_devices(token)
 
 
