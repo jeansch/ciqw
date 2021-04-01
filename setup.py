@@ -34,7 +34,7 @@ ciqw-install-fonts-and-devices = ciqw:install_fonts_and_devices
 """
 
 setup(name='ciqw',
-      version='0.4.4',
+      version='0.4.5',
       description="Connect IQ Wrapper",
       author="Jean Schurger",
       author_email='jean@schurger.org',
