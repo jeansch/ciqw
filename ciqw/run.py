@@ -93,6 +93,7 @@ def _build(do_release=False):
         command.append('--jungles')
         command.extend(jungles)
     out = "%s.%s" % (app, "prg" if not do_release else "iq")
+    out_ts = os.stat(out).st_mtime if os.path.exists(out) else 0
     if not do_release:
         command.extend(['--device', config['device']])
     else:
@@ -103,24 +104,34 @@ def _build(do_release=False):
         genkey()
     command.extend(config.get('flags', '').split())
     logger.info("Calling '%s'." % " ".join(command))
-    subprocess.Popen(command).wait()
-    if os.path.exists(out):
+    p = subprocess.Popen(command)
+    p.wait()
+    # might check p.returncode ?
+    if os.path.exists(out) and os.stat(out).st_mtime > out_ts:
         logger.info("Generated '%s'." % os.path.abspath(out))
+        return True
+    return False
 
 
 def _run(force_build=False):
     sim()
+    run = True
     config = read_config()
     app = _get_app_from_manifest()
     out = "%s.prg" % app
     if force_build or not os.path.exists(out):
-        _build()
-
-    os.environ['JAVA_OPTIONS'] = "--add-modules=java.xml.bind"
-    command = [_get_sdk_bin('monkeydo', config),
-               out, config['device']]
-    logger.info("Calling '%s'." % " ".join(command))
-    subprocess.Popen(command).wait()
+        run = _build()
+    if run:
+        os.environ['JAVA_OPTIONS'] = "--add-modules=java.xml.bind"
+        command = [_get_sdk_bin('monkeydo', config),
+                   out, config['device']]
+        logger.info("Calling '%s'." % " ".join(command))
+        p = subprocess.Popen(command)
+        # it kill itself if ran many files
+        # may be one day we will want that
+        # pid_file = os.path.join(os.path.dirname(
+        #     _get_sdk_bin('monkeydo', config)), ".monkeydo.pid")
+        # open(pid_file, "w").write(str(p.pid))
 
 
 def _may_build_and_run(path, filename):
@@ -136,24 +147,26 @@ def _auto():
     if not have_inotify:
         logger.info("Inotify not supported on your system yet.")
         sys.error(1)
-    i = inotify.adapters.InotifyTree(".")
-    for _ev, op, path, filename in i.event_gen(yield_nones=False):
-        if 'IN_CLOSE_WRITE' in op:
-            # check if in resources, sources
-            # and for filename (.jungle. .xml)
-            # Rebuild if necessary
-            # check stat of file and prg file
-            if any((
-                    filename == 'manifest.xml',
-                    path == '.' and filename.endswith('.monkey'),
-                    path.startswith('./source') and filename.endswith('.mc'),
-                    path.startswith('./resources') and
-                    filename.endswith('.xml') and
-                    not filename.endswith('.debug.xml'),
-                    path.startswith('./resources') and
-                    filename.endswith('.png'))):
-                _may_build_and_run(path, filename)
-
+    try:
+        i = inotify.adapters.InotifyTree(".")
+        for _ev, op, path, filename in i.event_gen(yield_nones=False):
+            if 'IN_CLOSE_WRITE' in op:
+                # check if in resources, sources
+                # and for filename (.jungle. .xml)
+                # Rebuild if necessary
+                # check stat of file and prg file
+                if any((
+                        filename == 'manifest.xml',
+                        path == '.' and filename.endswith('.monkey'),
+                        path.startswith('./source') and filename.endswith('.mc'),
+                        path.startswith('./resources') and
+                        filename.endswith('.xml') and
+                        not filename.endswith('.debug.xml'),
+                        path.startswith('./resources') and
+                        filename.endswith('.png'))):
+                    _may_build_and_run(path, filename)
+    except KeyboardInterrupt:
+        pass
 
 def _cd_call(fct):
     try:
