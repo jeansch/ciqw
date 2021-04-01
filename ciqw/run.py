@@ -18,6 +18,7 @@
 import logging
 import os
 import sys
+import socket
 import subprocess
 import xml.etree.ElementTree as ET
 have_inotify = False
@@ -66,10 +67,18 @@ def _get_sdk_bin(name, config):
 
 
 def sim():
+    s = socket.socket(socket. AF_INET, socket. SOCK_STREAM)
+    try:
+        s.connect(("127.0.0.1", 42877))
+        s.close()
+        logger.info("Simulator already runnning.")
+        return
+    except:
+        pass
     config = read_config()
     command = _get_sdk_bin('simulator', config)
     logger.info("Calling '%s'." % command)
-    subprocess.Popen([command]).wait()
+    subprocess.Popen([command])
 
 
 def _build(do_release=False):
@@ -103,6 +112,7 @@ def _build(do_release=False):
 
 
 def _run(force_build=False):
+    sim()
     config = read_config()
     app = _get_app_from_manifest()
     out = "%s.prg" % app
@@ -114,8 +124,6 @@ def _run(force_build=False):
     logger.info("Calling '%s'." % " ".join(command))
     subprocess.Popen(command).wait()
 
-
-# TODO check for 42877 port to see if simulator is here
 
 def _may_build_and_run(path, filename):
     logger.info("File modified: '%s'." % os.path.join(path, filename))
