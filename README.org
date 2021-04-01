@@ -81,7 +81,6 @@ ciqw-run
 
 You can use *ciqw-auto* to monitor sources changes and automaticaly rebuild and restart the application on the emulator !
 
-
 * Dependencies
 
 - Python3
@@ -111,6 +110,15 @@ A quick look at the config.ini with show that the following options are tunable:
 ⓘ That config file is created the first time if not present.
 
 There is few more ciqw commands, just explore it, they are quite self-explanatory.
+
+* Limitations
+
+- It looks like there is SSL certificate issues using /requests/ on OSX.
+For that reason, SSL problems are *ignored* running on OSX.
+
+- As OSX does not have support for /inotify/ *ciqw-auto* will not works a long I find another way to monitor the file changes.
+
+- There is no support for Windows OS right now.
 
 * Motivation, Thanks
 
