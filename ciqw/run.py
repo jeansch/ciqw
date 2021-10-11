@@ -40,7 +40,7 @@ def _get_app_from_manifest():
     return manifest.find('{%s}application' % ns).attrib['entry']
 
 
-def _get_sdk_bin(name, config):
+def get_sdk_root(name, config):
     if not config.get('version'):
         _install_sdk()
     config.update(read_config())
@@ -62,8 +62,12 @@ def _get_sdk_bin(name, config):
             sdk = f
             break
     if sdk:
-        return os.path.join(config['sdks'], sdk, 'bin', name)
+        return os.path.join(config['sdks'], sdk)
     _install_sdk(config.get('version'))
+
+
+def _get_sdk_bin(name, config):
+    return os.path.join(get_sdk_root(name, config), 'bin', name)
 
 
 def sim():

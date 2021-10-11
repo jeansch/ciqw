@@ -16,16 +16,34 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 
 import logging
-logging.basicConfig()
-logging.getLogger().setLevel(logging.INFO)
-logging.getLogger().handlers[0].setFormatter(
-    logging.Formatter('%(message)s'))
+import os
+import sys
+import subprocess
 
-from ciqw.sdks import  install_sdk, install_sdkmanager, list_sdks, run_sdkmanager
-from ciqw.config import init, setup_logger
-from ciqw.run import build, run, auto, sim, release
-from ciqw.auth import login
-from ciqw.fonts_and_devices import install_fonts_and_devices
-from ciqw.misc import doc, samples, samples_path
+from ciqw.config import read_config, genkey  # pylint: disable=C0413
+from ciqw.run import get_sdk_root
 
-setup_logger()
+
+logger = logging.getLogger(__name__)
+
+
+def doc():
+    config = read_config()
+    command = ['xdg-open', os.path.join(get_sdk_root(
+        'monkeydo', config), 'README.html')]
+    logger.info("Calling '%s'." % " ".join(command))
+    p = subprocess.Popen(command)
+
+
+def samples():
+    config = read_config()
+    command = ['xdg-open', os.path.join(get_sdk_root(
+        'monkeydo', config), 'samples')]
+    logger.info("Calling '%s'." % " ".join(command))
+    p = subprocess.Popen(command)
+
+
+def samples_path():
+    config = read_config()
+    print(os.path.join(get_sdk_root(
+        'monkeydo', config), 'samples'))

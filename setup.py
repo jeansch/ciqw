@@ -31,10 +31,13 @@ ciqw-genkey = ciqw:genkey
 ciqw-sim = ciqw:sim
 ciqw-login = ciqw:login
 ciqw-install-fonts-and-devices = ciqw:install_fonts_and_devices
+ciqw-doc = ciqw:doc
+ciqw-samples = ciqw:samples
+ciqw-samples-path = ciqw:samples_path
 """
 
 setup(name='ciqw',
-      version='0.4.7',
+      version='0.4.8',
       description="Connect IQ Wrapper",
       author="Jean Schurger",
       author_email='jean@schurger.org',
