@@ -56,9 +56,13 @@ def get_sdk_root(name, config):
                             'Garmin', 'ConnectIQ', 'Sdks',
                             'connectiq-sdk', 'bin', name)
     sdk = None
+    version = config['version']
+    if '.beta' in version:
+        version = version.replace(".beta", "-Beta-")
     for f in os.listdir(os.path.join(config['sdks'])):
         if (os.path.isdir(os.path.join(config['sdks'], f)) and
-                f.startswith("connectiq-sdk-") and config['version'] in f):
+                f.startswith("connectiq-sdk-") and
+            version in f):
             sdk = f
             break
     if sdk:

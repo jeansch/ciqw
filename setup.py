@@ -37,7 +37,7 @@ ciqw-samples-path = ciqw:samples_path
 """
 
 setup(name='ciqw',
-      version='0.4.8',
+      version='0.4.9',
       description="Connect IQ Wrapper",
       author="Jean Schurger",
       author_email='jean@schurger.org',
