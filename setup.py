@@ -31,6 +31,7 @@ ciqw-genkey = ciqw:genkey
 ciqw-sim = ciqw:sim
 ciqw-login = ciqw:login
 ciqw-install-fonts-and-devices = ciqw:install_fonts_and_devices
+ciqw-list-devices = ciqw:list_devices
 ciqw-doc = ciqw:doc
 ciqw-samples = ciqw:samples
 ciqw-samples-path = ciqw:samples_path

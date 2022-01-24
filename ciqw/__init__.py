@@ -25,7 +25,7 @@ from ciqw.sdks import  install_sdk, install_sdkmanager, list_sdks, run_sdkmanage
 from ciqw.config import init, setup_logger
 from ciqw.run import build, run, auto, sim, release
 from ciqw.auth import login
-from ciqw.fonts_and_devices import install_fonts_and_devices
+from ciqw.fonts_and_devices import install_fonts_and_devices, list_devices
 from ciqw.misc import doc, samples, samples_path
 
 setup_logger()

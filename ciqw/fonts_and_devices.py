@@ -77,6 +77,14 @@ def install_fonts_and_devices():
     _install_fonts_and_devices(token)
 
 
+def list_devices():
+    token = _get_access_token()
+    if not token:
+        logger.error("You need to login to install fonts and devices")
+        sys.exit(1)
+    _list_devices(token)
+
+
 def _install_fonts_and_devices(token):
     _install_fonts(token)
     _install_devices(token)
@@ -145,3 +153,31 @@ def _install_devices(token):
             zf = zipfile.ZipFile(device_path + ".zip")
             zf.extractall(device_path)
             os.unlink(device_path + ".zip")
+
+
+def _list_devices(token):
+    devices_root = os.path.join(os.getenv('HOME'), '.Garmin',
+                                'ConnectIQ', 'Devices')
+    if sys.platform.lower().startswith('darwin'):
+        devices_root = os.path.join(os.getenv('HOME'), 'Library',
+                                    'Application Support',
+                                    'Garmin', 'ConnectIQ', 'Devices')
+    os.makedirs(devices_root, exist_ok=True)
+    for device in sorted(get_device_list(token), key=lambda d: d['lastUpdateTime']):
+        # {'deviceUuid': 'b957e0db-67bb-4b6f-9aa2-426efcbe46fe',
+        # 'partNumber': '006-B2859-00',
+        # 'name': 'descentmk1',
+        # 'productInfoFileExists': True,
+        # 'ciqInfoFileExists': True,
+        # 'upcoming': False,
+        # 'productInfoHash': 'c79e0b7fee6d01b0d47757cf7ad587e5',
+        # 'ciqInfoHash': 'c96d495c2b8512a4e3c0c504d6f936a2',
+        # 'group': 'Watches/Wearables',
+        # 'displayName': 'Descent™ Mk1',
+        # 'lastUpdateTime': '2020-08-19 17:16:16'}
+        dnames = device['displayName'].split('/')
+        for name in dnames:
+            print('%24s %42s %s' % (
+                device['name'],
+                '"%s"' % name.strip(),
+                device['partNumber']))
