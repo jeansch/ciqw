@@ -32,6 +32,18 @@ DEVCIQ = 'https://developer.garmin.com/downloads/connect-iq/'
 SSL_VERIFY = not sys.platform.lower().startswith('darwin')
 
 
+def agreement():
+    if 'GARMIN_AGREEMENT' not in os.environ:
+        print("By downloading any of the Connect IQ SDK, you accept "
+              "Garmin license agreement defined at "
+              "https://developer.garmin.com/connect-iq/sdk/")
+        print("\nPress enter to continue, or ctrl-c to abort.")
+        try:
+            input()
+        except KeyboardInterrupt:
+            sys.exit(1)
+
+
 def _install_sdk(version=None):
     sdks = get_available_sdks()
     if not version:
@@ -46,6 +58,7 @@ def _install_sdk(version=None):
         target = os.path.join(config['sdks'], "connectiq-sdk")
     package_name = sdks[version]['package']
     package = os.path.join(config.get('sdks'), package_name)
+    agreement()
     if not os.path.exists(package):
         url = DEVCIQ + 'sdks/' + sdks[version]['package']
         logger.info("Downloading '%s'" % url)
