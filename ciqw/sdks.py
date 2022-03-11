@@ -71,6 +71,11 @@ def _install_sdk(version=None):
             os.makedirs(target, exist_ok=True)
             zf = zipfile.ZipFile(package)
             zf.extractall(target)
+    if not sys.platform.lower().startswith('darwin'):
+        api_db = os.path.join(target, "share", "simulator", "api.db")
+        if not os.path.exists(api_db):
+            os.makedirs(os.path.dirname(api_db), exist_ok=True)
+            os.symlink(os.path.join(target, "bin", "api.db"), api_db)
     if package.endswith(".dmg"):
         if not os.path.exists(os.path.join(target, 'bin', 'monkeyc')):
             logger.info("Extracting '%s' to '%s'." % (package, target))
