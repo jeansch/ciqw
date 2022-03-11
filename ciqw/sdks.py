@@ -72,6 +72,8 @@ def _install_sdk(version=None):
         cp['ciqw'] = config
         with open(CONFIG_FILENAME, 'w') as configfile:
             cp.write(configfile)
+        open(os.path.join(config['connectiq'], 'current-sdk.cfg'), "w").write(
+            target)
     if os.path.exists(os.path.join(target, 'bin')):
         for f in os.listdir(os.path.join(target, 'bin')):
             bin = os.path.join(target, 'bin', f)

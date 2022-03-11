@@ -35,6 +35,11 @@ DEFAULT_CONFIG = {
 
 if sys.platform.lower().startswith('darwin'):
     DEFAULT_CONFIG.update({
+        'connectiq': os.path.join(os.environ['HOME'],
+                                  'Library',
+                                  'Application Support',
+                                  'Garmin',
+                                  "ConnectIQ"),
         'sdks': os.path.join(os.environ['HOME'],
                              'Library',
                              'Application Support',
@@ -48,6 +53,8 @@ if sys.platform.lower().startswith('darwin'):
     })
 else:
     DEFAULT_CONFIG.update({
+        'connectiq': os.path.join(os.environ['HOME'],
+                                  ".Garmin", "ConnectIQ"),
         'sdks': os.path.join(os.environ['HOME'],
                              ".Garmin", "ConnectIQ", "Sdks"),
         'sdkmanager': os.path.join(os.environ['HOME'],
@@ -60,7 +67,10 @@ def read_config():
         init()
     cp = configparser.ConfigParser()
     cp.read(CONFIG_FILENAME)
-    return dict(cp['ciqw'])
+    config = dict(cp['ciqw'])
+    for k, v in DEFAULT_CONFIG.items():
+        config.setdefault(k, v)
+    return config
 
 
 def init():
